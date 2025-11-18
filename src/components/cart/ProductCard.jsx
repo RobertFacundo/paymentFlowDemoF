@@ -11,7 +11,7 @@ const ProductCard = () => {
                 <ProductTitle>Payment Gateway Experience</ProductTitle>
                 <Divider sx={{ mb: 2 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <ProductPrice amount='0.10' />
+                    <ProductPrice amount='0.50' />
                 </Box>
             </CardContent>
         </Card>
