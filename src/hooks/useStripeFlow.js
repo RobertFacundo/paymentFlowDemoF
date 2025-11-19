@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { startStripePaymentIntent } from "../redux/slices/paymentSlice";
+import { startStripePaymentIntent } from "../redux/slices/stripeSlice";
 import { addLog } from "../redux/slices/logSlice";
 
 export const useStripeFlow = () => {

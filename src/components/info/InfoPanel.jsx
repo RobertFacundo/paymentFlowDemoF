@@ -5,9 +5,10 @@ const InfoPanel = ({ children }) => {
         <Paper
             elevation={3}
             sx={{
-                width: '100%',
-                height: '100%',
+                width: '95%',
+                height: '90%',
                 p: 2,
+                mt:3,
                 overflowY: 'auto',
                 borderRadius: 2
             }}

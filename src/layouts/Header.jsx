@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 
 const Header = () => {
     return (
-        <Box sx={{ md: 4, textAlign: 'center' }}>
+        <Box sx={{ textAlign: 'center' }}>
             <Typography variant='h4' fontWeight='bold'>
                 Payment Flow Demo
             </Typography>

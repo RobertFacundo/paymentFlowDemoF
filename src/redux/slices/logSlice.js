@@ -12,7 +12,7 @@ const logSlice = createSlice({
             state.steps.push({
                 type,
                 message,
-                time: new Date().toLocaleDateString()
+                time: new Date().toLocaleTimeString()
             });
         },
         clearLogs: (state) => {

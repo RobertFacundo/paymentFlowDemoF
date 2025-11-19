@@ -4,13 +4,16 @@ import InfoPanel from '../components/info/InfoPanel';
 import InfoStepList from '../components/info/InfoStepList';
 import InfoStepItem from '../components/info/InfoStepItem';
 import InfoPanelTitle from '../components/info/InfoPanelTitle';
+import StripeCardStep from '../components/stripe/StripeCardStep';
 
 const InfoPanelLayout = () => {
-    const steps = useSelector(state => state.logs.steps)
+    const steps = useSelector(state => state.logs.steps);
+    const clientSecret = useSelector(state => state.payment.clientSecret)
+    const paymentStatus = useSelector(state => state.payment.paymentStatus)
 
     return (
-        <Box sx={{ width: '90%', height: '90%', p: 2, ml: 5, overflowX: 'hidden' }}>
-            <InfoPanel sx={{ height: '100%' }}>
+        <Box sx={{ flex: 1, height: '80%', overflowX: 'hidden', pl: 3, m: 2 }}>
+            <InfoPanel >
                 <InfoPanelTitle title='Logs' />
                 <InfoStepList>
                     {steps.length === 0 ? (
@@ -24,7 +27,11 @@ const InfoPanelLayout = () => {
                             <InfoStepItem key={i} time={step.time} type={step.type} message={step.message} />
                         ))
                     )}
+                    { }
                 </InfoStepList>
+                {clientSecret && paymentStatus !== 'succeeded' && (
+                    <StripeCardStep />
+                )}
             </InfoPanel>
         </Box>
     )

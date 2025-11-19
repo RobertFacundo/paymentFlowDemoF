@@ -1,20 +1,28 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createPaymentIntentRequest } from '../../services/stripeService';
-import { addLog } from './logSlice';
+import { addLog, clearLogs } from './logSlice';
 
 export const startStripePaymentIntent = createAsyncThunk(
     "payment/startStripePaymentIntent",
     async (_, thunkAPI) => {
+        thunkAPI.dispatch(clearLogs());
+
+        const state = thunkAPI.getState();
+
+        if (state.payment.clientSecret) {
+            thunkAPI.dispatch(setClientSecret(null))
+        }
+
         thunkAPI.dispatch(addLog({
             type: 'front',
-            message: "Frontend → Sending PaymentIntent request to backend (amount, currency, description)."
+            message: "Sending PaymentIntent request to backend (amount, currency, description)."
         }))
         try {
             const response = await createPaymentIntentRequest();
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: "Backend → Request received. Validating data and preparing Stripe PaymentIntent."
+                message: "Request received. Validating data and preparing Stripe PaymentIntent."
             }));
 
             thunkAPI.dispatch(addLog({
@@ -29,8 +37,13 @@ export const startStripePaymentIntent = createAsyncThunk(
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: "Frontend → Received the clientSecret. This value will be used by Stripe Elements to handle card details securely."
+                message: "Received the clientSecret. This value will be used by Stripe Elements to handle card details securely."
             }));
+
+            thunkAPI.dispatch(addLog({
+                type: 'front',
+                message: "ℹ️ Use test card 4242 4242 4242 4242 (MM/YY in future, any CVC) for testing."
+            }))
 
             return response;
         } catch (error) {
@@ -49,15 +62,24 @@ const paymentSlice = createSlice({
         provider: null,
         status: 'idle',
         clientSecret: null,
-        paymentStatus: null,
+        paymentStatus: 'idle',
         log: [],
     },
-    reducers: {},
+    reducers: {
+        setPaymentStatus: (state, action) => {
+            state.paymentStatus = action.payload;
+        },
+        setClientSecret: (state, action) => {
+            state.clientSecret = action.payload
+        }
+    },
     extraReducers: builder => {
         builder
             .addCase(startStripePaymentIntent.pending, (state) => {
                 state.provider = 'stripe';
                 state.status = "pending";
+                // Resetear clientSecret y logs
+                state.clientSecret = null;
                 console.log("⏳ [REDUX] PaymentIntent pending...");
             })
             .addCase(startStripePaymentIntent.fulfilled, (state, action) => {
@@ -72,4 +94,5 @@ const paymentSlice = createSlice({
     }
 });
 
+export const { setPaymentStatus, setClientSecret } = paymentSlice.actions;
 export default paymentSlice.reducer;
