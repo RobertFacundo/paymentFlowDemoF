@@ -13,6 +13,11 @@ const typeConfig = {
         color: "success",
         label: "BACKEND",
         icon: <StorageOutlined fontSize="small" />
+    },
+    flow: {
+        color: "info",
+        label: "FLOW",
+        icon: <BoltOutlined fontSize="small" /> // o algún ícono más representativo
     }
 }
 
