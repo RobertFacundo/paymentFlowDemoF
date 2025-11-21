@@ -6,12 +6,14 @@ import InfoStepItem from '../components/info/InfoStepItem';
 import InfoPanelTitle from '../components/info/InfoPanelTitle';
 import StripeCardStep from '../components/stripe/StripeCardStep';
 import { Wallet } from '@mercadopago/sdk-react';
+import PayPalButtonWrapper from '../components/paypal/PayPalButtonWrapper';
 
 const InfoPanelLayout = () => {
     const steps = useSelector(state => state.logs.steps);
     const clientSecret = useSelector(state => state.payment.clientSecret)
     const paymentStatus = useSelector(state => state.payment.paymentStatus)
     const preferenceId = useSelector(state => state.mercadoPago.preferenceId);
+    const paypalOrderId = useSelector(state => state.paypal.orderId);
 
     return (
         <Box sx={{ flex: 1, height: '80%', overflowX: 'hidden', pl: 3, m: 2 }}>
@@ -31,14 +33,15 @@ const InfoPanelLayout = () => {
                     )}
                     { }
                 </InfoStepList>
-                {clientSecret && paymentStatus !== 'succeeded' && (
+                {!paypalOrderId && !preferenceId && clientSecret && paymentStatus !== 'succeeded' && (
                     <StripeCardStep />
                 )}
-                {preferenceId && (
+                {!paypalOrderId && preferenceId && (
                     <Box sx={{ mt: 3 }}>
                         <Wallet initialization={{ preferenceId }} />
                     </Box>
                 )}
+                {paypalOrderId && <PayPalButtonWrapper />}
             </InfoPanel>
         </Box>
     )
