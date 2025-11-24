@@ -36,11 +36,11 @@ const InfoPanelLayout = () => {
                 {!paypalOrderId && !preferenceId && clientSecret && paymentStatus !== 'succeeded' && (
                     <StripeCardStep />
                 )}
-                {!paypalOrderId && preferenceId && (
+                {/* {!paypalOrderId && preferenceId && (
                     <Box sx={{ mt: 3 }}>
                         <Wallet initialization={{ preferenceId }} />
                     </Box>
-                )}
+                )} */}
                 {paypalOrderId && <PayPalButtonWrapper />}
             </InfoPanel>
         </Box>
