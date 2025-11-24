@@ -10,7 +10,7 @@ export const usePayPalLogic = () => {
     const handleCreateOrder = () => {
         dispatch(addLog({
             type: "front",
-            message: "🛒 PayPal: sending orderId to PayPal Buttons..."
+            tKey: "logs.paypal.sending_orderId_front"
         }));
 
         return paypalOrderId;
@@ -19,7 +19,7 @@ export const usePayPalLogic = () => {
     const handleApprove = async () => {
         dispatch(addLog({
             type: "front",
-            message: "👍 PayPal: payment approved by user, capturing..."
+            tKey: "logs.paypal.user_approved"
         }));
 
         try {
@@ -27,20 +27,25 @@ export const usePayPalLogic = () => {
 
             dispatch(addLog({
                 type: "backend",
-                message: "🟢 Backend captured PayPal order successfully."
+                tKey: "logs.paypal.backend_captured"
             }));
 
             dispatch(addLog({
                 type: "front",
-                message: "🎉 PayPal payment succeeded!"
+                tKey: "logs.paypal.payment_succeeded"
             }));
 
             dispatch(setPaymentStatus("succeeded"));
 
+            setTimeout(() => {
+                dispatch(resetPayPalState());
+            }, 300);
+
         } catch (error) {
             dispatch(addLog({
                 type: "backend",
-                message: `❌ Capture error: ${error.message}`
+                tKey: 'logs.paypal.capture_error',
+                params: { error: error.message }
             }));
 
             dispatch(setPaymentStatus("failure"));
@@ -50,7 +55,8 @@ export const usePayPalLogic = () => {
     const handleError = (error) => {
         dispatch(addLog({
             type: "front",
-            message: `⚠️ PayPal error: ${error.message}`
+            tKey: 'logs.paypal.general_error',
+            params: { error: error.message }
         }));
 
         dispatch(setPaymentStatus("failure"));

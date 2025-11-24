@@ -7,11 +7,13 @@ const logSlice = createSlice({
     },
     reducers: {
         addLog: (state, action) => {
-            const { type, message } = action.payload;
+            const { type, message, tKey, params } = action.payload;
 
             state.steps.push({
                 type,
-                message,
+                tKey: tKey || null,
+                params: params || null,
+                message: message || null,
                 time: new Date().toLocaleTimeString()
             });
         },

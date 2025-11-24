@@ -1,11 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createPaymentIntentRequest } from '../../services/stripeService';
 import { addLog, clearLogs } from './logSlice';
+import { resetPayPalState } from './paypalSlice';
+import { resetMercadoPagoState } from './mercadoPagoSlice';
 
 export const startStripePaymentIntent = createAsyncThunk(
     "payment/startStripePaymentIntent",
     async (_, thunkAPI) => {
+
+        thunkAPI.dispatch(resetPayPalState())
+        thunkAPI.dispatch(resetMercadoPagoState())
         thunkAPI.dispatch(clearLogs());
+
+        thunkAPI.dispatch(addLog({
+            type: 'front',
+            tKey: "logs.stripe.initializing"
+        }))
 
         const state = thunkAPI.getState();
 
@@ -15,34 +25,35 @@ export const startStripePaymentIntent = createAsyncThunk(
 
         thunkAPI.dispatch(addLog({
             type: 'front',
-            message: "Sending PaymentIntent request to backend (amount, currency, description)."
+            tKey: "logs.stripe.sending_paymentIntent"
         }))
         try {
             const response = await createPaymentIntentRequest();
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: "Request received. Validating data and preparing Stripe PaymentIntent."
+                tKey: "logs.stripe.request_received"
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: "Stripe API → PaymentIntent created successfully. This represents a secure placeholder for the future payment."
+                tKey: "logs.stripe.paymentIntent_created"
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: `Stripe → Returned clientSecret (${response.clientSecret}). The clientSecret allows the frontend to securely confirm the payment WITHOUT exposing secret API keys.`
+                tKey: 'logs.stripe.client_secret',
+                params: { clientSecret: response.clientSecret }
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: "Received the clientSecret. This value will be used by Stripe Elements to handle card details securely."
+                tKey: "logs.stripe.stripe_card"
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: "ℹ️ Use test card 4242 4242 4242 4242 (MM/YY in future, any CVC) for testing."
+                tKey: "logs.stripe.mock_card"
             }))
 
             return response;
@@ -69,8 +80,10 @@ const paymentSlice = createSlice({
         setPaymentStatus: (state, action) => {
             state.paymentStatus = action.payload;
         },
-        setClientSecret: (state, action) => {
-            state.clientSecret = action.payload
+        resetStripeState: (state) => {
+            state.clientSecret = null;
+            state.paymentStatus = 'idle';
+            state.status = 'idle';
         }
     },
     extraReducers: builder => {
@@ -94,5 +107,5 @@ const paymentSlice = createSlice({
     }
 });
 
-export const { setPaymentStatus, setClientSecret } = paymentSlice.actions;
+export const { setPaymentStatus, resetStripeState } = paymentSlice.actions;
 export default paymentSlice.reducer;

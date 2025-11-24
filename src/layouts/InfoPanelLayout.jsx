@@ -16,7 +16,7 @@ const InfoPanelLayout = () => {
     const paypalOrderId = useSelector(state => state.paypal.orderId);
 
     return (
-        <Box sx={{ flex: 1, height: '80%', overflowX: 'hidden', pl: 3, m: 2 }}>
+        <Box sx={{ flex: 1, height: '80%', overflowX: 'hidden', pl: 3, ml:2 }}>
             <InfoPanel >
                 <InfoPanelTitle title='Logs' />
                 <InfoStepList>
@@ -24,11 +24,11 @@ const InfoPanelLayout = () => {
                         <InfoStepItem
                             time="--:--:--"
                             type="flow"
-                            message="Select a payment gateway to begin the technical flow..."
+                            tKey='logs.select_provider'
                         />
                     ) : (
                         steps.map((step, i) => (
-                            <InfoStepItem key={i} time={step.time} type={step.type} message={step.message} />
+                            <InfoStepItem key={i} time={step.time} type={step.type} tKey={step.tKey} params={step.params} message={step.message} />
                         ))
                     )}
                     { }

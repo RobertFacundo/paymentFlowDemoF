@@ -1,14 +1,19 @@
 import { Box, Typography } from '@mui/material';
+import LanguageToggle from '../components/LanguageToggle';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
+    const { t } = useTranslation();
+
     return (
-        <Box sx={{ textAlign: 'center', mt:2 }}>
+        <Box sx={{ textAlign: 'center', mt: 2 }}>
             <Typography variant='h4' fontWeight='bold'>
-                Payment Flow Demo
+                {t('header.title')}
             </Typography>
             <Typography variant='subtitle1' color='textSecondary' sx={{ fontStyle: 'italic', letterSpacing: 0.5 }}>
-                Explore the technical flow of multiple payment gateways
+                {t('header.subtitle')}
             </Typography>
+            <LanguageToggle />
         </Box>
     )
 };

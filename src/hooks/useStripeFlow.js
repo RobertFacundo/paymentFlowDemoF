@@ -12,11 +12,7 @@ export const useStripeFlow = () => {
         paymentStatus
     } = useSelector(state => state.payment);
 
-    const startStripeFlow = ()=>{
-        dispatch(addLog({
-            type: 'front',
-            message: "User selected Stripe as payment provider → Initializing Stripe payment flow."
-        }))
+    const startStripeFlow = () => {
         dispatch(startStripePaymentIntent());
     };
 

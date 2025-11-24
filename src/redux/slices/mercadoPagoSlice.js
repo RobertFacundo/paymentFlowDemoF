@@ -1,12 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createMercadoPagoPreference } from '../../services/mercadoPagoService';
 import { addLog, clearLogs } from './logSlice';
+import { resetPayPalState } from './paypalSlice';
+import { resetStripeState } from './stripeSlice';
 
 export const startMercadoPagoFlow = createAsyncThunk(
     'mercadopago/startflow',
     async (_, thunkAPI) => {
+        thunkAPI.dispatch(resetPayPalState());
+        thunkAPI.dispatch(resetStripeState())
         thunkAPI.dispatch(clearLogs());
-        thunkAPI.dispatch(addLog({ type: 'front', message: 'initializing Mercado Pago payment flow' }));
+        thunkAPI.dispatch(addLog({ type: 'front', tKey: 'logs.mp.initializing' }));
 
         const payload = {
             product: 'Payment Flow Demo',
@@ -16,63 +20,65 @@ export const startMercadoPagoFlow = createAsyncThunk(
 
         thunkAPI.dispatch(addLog({
             type: 'front',
-            message: `📦 Preparing purchase data: product="${payload.product}", amount=$${payload.amount} ${payload.currency}`
+            tKey: 'logs.mp.preparing_data',
+            params: payload
         }));
 
         try {
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '📡 Sending request to backend to create Mercado Pago preference...'
+                tKey: 'logs.mp.sending_request_backend',
             }));
 
             const response = await createMercadoPagoPreference(payload);
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message:
-                    '🟢 Backend received the request and contacted Mercado Pago servers to create the payment session.'
+                tKey:
+                    'logs.mp.backend_received_request'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '🧩 The backend returned a preferenceId. This ID uniquely identifies the payment session and allows the Wallet component to render the Mercado Pago checkout.'
+                tKey: 'logs.mp.backend_returned_preference'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '💳 With this preferenceId, the Wallet component can securely redirect the user to Mercado Pago’s payment platform.'
+                tKey: 'logs.mp.wallet_explanation'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '🪙 Rendering Mercado Pago Wallet. The user will be redirected to complete the payment...'
+                tKey: 'logs.mp.rendering_wallet'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'flow',
-                message: '🔄 After redirection, logs will not be visible. Final payment status is notified by webhook.'
+                tKey: 'logs.mp.redirect_flow'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'flow',
-                message: '1️⃣ Webhook → backend receives Mercado Pago notification (approved, rejected, pending).'
+                tKey: 'logs.mp.webhook_step'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'flow',
-                message: '2️⃣ Polling → frontend can check payment status after returning from checkout.'
+                tKey: 'logs.mp.polling_step'
             }));
 
             return response;
         } catch (error) {
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: `❌ Error creating Mercado Pago preference: ${error.message}`
+                message: 'logs.mp.error_creating_preference',
+                params: { error: error.message }
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '⚠️ Possible causes: missing credentials, Mercado Pago test user issues, card verification required, or backend misconfiguration.'
+                tKey: 'logs.mp.error_possible_causes'
             }));
 
             return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -92,6 +98,12 @@ const mercadoPagoSlice = createSlice({
     reducers: {
         setPaymentStatus: (state, action) => {
             state.paymentStatus = action.payload;
+        },
+        resetMercadoPagoState: (state) => {
+            state.status = 'idle';
+            state.preferenceId = null;
+            state.checkoutUrl = null;
+            state.paymentStatus = 'idle';
         }
     },
     extraReducers: (builder) => {
@@ -116,5 +128,5 @@ const mercadoPagoSlice = createSlice({
     }
 });
 
-export const { setPaymentStatus } = mercadoPagoSlice.actions;
+export const { setPaymentStatus, resetMercadoPagoState } = mercadoPagoSlice.actions;
 export default mercadoPagoSlice.reducer;

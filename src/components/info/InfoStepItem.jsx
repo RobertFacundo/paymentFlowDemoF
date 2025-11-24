@@ -2,6 +2,7 @@ import { Box, Typography, Paper, Chip } from "@mui/material";
 import { BoltOutlined } from "@mui/icons-material";
 import { StorageOutlined } from "@mui/icons-material";
 import { AccessTime } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 const typeConfig = {
     front: {
@@ -21,8 +22,11 @@ const typeConfig = {
     }
 }
 
-const InfoStepItem = ({ time, type, message }) => {
-    const cfg = typeConfig[type]
+const InfoStepItem = ({ time, type, tKey, params, message }) => {
+    const cfg = typeConfig[type] || typeConfig.flow;
+    const { t } = useTranslation();
+
+    const renderedMessage = tKey ? t(tKey, params || {}) : (message || '');
 
     return (
         <Paper
@@ -53,7 +57,7 @@ const InfoStepItem = ({ time, type, message }) => {
                     size="small"
                 />
             </Box>
-            <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono, monospace' }}>{message}</Typography>
+            <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono, monospace' }}>{renderedMessage}</Typography>
         </Paper>
     );
 };

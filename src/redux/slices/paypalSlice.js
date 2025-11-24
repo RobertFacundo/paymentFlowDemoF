@@ -8,46 +8,48 @@ export const startPayPalFlow = createAsyncThunk(
         thunkAPI.dispatch(clearLogs());
         thunkAPI.dispatch(addLog({
             type: 'front',
-            message: 'Initializing PayPal payment flow...'
+            tKey: 'logs.paypal.initializing'
         }));
 
         thunkAPI.dispatch(addLog({
             type: 'front',
-            message: `📦 Preparing purchase data: amount=$${payload.amount} USD`
+            tKey: 'logs.paypal.preparing_data',
+            params: { amount: payload.amount }
         }));
 
         try {
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '📡 Sending request to backend to create PayPal order...'
+                tKey: 'logs.paypal.sending_request_backend'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: '🖥️ Backend processing request...'
+                tKey: 'logs.paypal.backend_processing'
             }));
 
             const order = await createPayPalOrder(payload);
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: '🟢 Backend created PayPal order successfully.'
+                tKey: 'logs.paypal.backend_created_order'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: `🧩 Frontend received orderId from backend: ${order.id}. Ready to initialize PayPal widget.`
+                tKey: 'logs.paypal.frontend_received_orderId',
+                params: { id: order.id }
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: '🪟 Rendering PayPal checkout button...'
+                tKey: 'logs.paypal.rendering_button'
             }));
 
             thunkAPI.dispatch(addLog({
                 type: 'front',
-                message: `💳 Use this PayPal Sandbox Test Card:\n    • Card Number: 4299 1966 7020 9475\n    • Expiry: 11/2030\n    • CVC: Any 3 digits`
+                tKey: 'logs.paypal.sandbox_card'
             }));
 
             return order;
@@ -56,7 +58,8 @@ export const startPayPalFlow = createAsyncThunk(
 
             thunkAPI.dispatch(addLog({
                 type: 'backend',
-                message: `❌ Error creating PayPal order: ${error.message}`
+                tKey: 'logs.paypal.error_creating_order',
+                params: { error: error.message }
             }));
 
             return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -74,6 +77,11 @@ const paypalSlice = createSlice({
     reducers: {
         setPaymentStatus: (state, action) => {
             state.paymentStatus = action.payload;
+        },
+        resetPayPalState: (state) => {
+            state.orderId = null;
+            state.paymentStatus = 'idle';
+            state.status = 'idle';
         }
     },
     extraReducers: (builder) => {
@@ -92,5 +100,5 @@ const paypalSlice = createSlice({
     }
 });
 
-export const { setPaymentStatus } = paypalSlice.actions;
+export const { setPaymentStatus, resetPayPalState } = paypalSlice.actions;
 export default paypalSlice.reducer;

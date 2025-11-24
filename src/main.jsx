@@ -6,7 +6,8 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store.js';
 import StripeProvider from './components/stripe/StripeProvider.jsx';
 import './App.css';
-import { initMercadoPago } from '@mercadopago/sdk-react'
+import { initMercadoPago } from '@mercadopago/sdk-react';
+import './i18n';
 
 initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY, { locale: 'es-AR' })
 

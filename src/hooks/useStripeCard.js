@@ -18,7 +18,7 @@ export const useStripeCard = () => {
         if (!stripe || !elements) {
             dispatch(addLog({
                 type: 'front',
-                message: "⚠ Stripe has not finished loading. Please wait...",
+                tKey: "logs.stripe.card_loading",
             }))
             return;
         }
@@ -28,7 +28,7 @@ export const useStripeCard = () => {
 
         dispatch(addLog({
             type: 'front',
-            message: 'Sending card data securely to Stripe...'
+            tKey: 'logs.stripe.sending_card'
         }));
 
         const cardElement = elements.getElement(CardElement);
@@ -42,7 +42,8 @@ export const useStripeCard = () => {
         if (result.error) {
             dispatch(addLog({
                 type: 'backend',
-                message: `❌ Stripe → Payment failed: ${result.error.message}`
+                tKey: 'logs.stripe.card_failed',
+                params: { error: result.error.message }
             }));
 
             setErrorMessage(result.error.message);
@@ -54,7 +55,8 @@ export const useStripeCard = () => {
 
         dispatch(addLog({
             type: 'backend',
-            message: `✅ Stripe → Payment succeeded! PaymentIntent: ${result.paymentIntent.id}`
+            tKey: 'logs.stripe.card_succeeded',
+            params: { id: result.paymentIntent.id }
         }));
 
         setLoading(false);
