@@ -43,7 +43,6 @@ export const startStripePaymentIntent = createAsyncThunk(
             thunkAPI.dispatch(addLog({
                 type: 'backend',
                 tKey: 'logs.stripe.client_secret',
-                params: { clientSecret: response.clientSecret }
             }));
 
             thunkAPI.dispatch(addLog({
