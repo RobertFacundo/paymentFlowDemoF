@@ -78,7 +78,7 @@ The project uses:
 
 - The app includes a single default product:
 
-```json
+```js
 Product: PaymentFlow Demo
 Price: $0.10 USD
 ```
